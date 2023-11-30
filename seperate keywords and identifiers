@@ -1,0 +1,23 @@
+%{
+#include <stdio.h>
+%}
+
+%%
+
+"int"|"float"|"char"|"void"    { printf("<KEYWORD, %s>\n", yytext); }
+[a-zA-Z][a-zA-Z0-9]*            { printf("<IDENTIFIER, %s>\n", yytext); }
+[ \t\n]                         ; // Ignore whitespace
+
+.                               ; // Ignore other characters
+
+%%
+
+int main() {
+    printf("Enter the C code:\n");
+    yylex();
+    return 0;
+}
+int yywrap()
+{
+  return 1;
+}
