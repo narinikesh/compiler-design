@@ -1,0 +1,82 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+// Function to generate unique temporary variable names
+char *generateTemp() {
+    static int tempCount = 0;
+    char *tempVar = (char *)malloc(10); // Assuming variable names are at most 10 characters
+    sprintf(tempVar, "temp%d", tempCount++);
+    return tempVar;
+}
+
+// Function to convert infix expression to three-address code
+void generateThreeAddressCode(char *expression) {
+    char *operators = "+-*/";
+    char *operands[50];
+    char *tempVars[50];
+    int operandCount = 0;
+    int tempVarCount = 0;
+
+    // Tokenize the expression
+    char *token = strtok(expression, " ");
+    while (token != NULL) {
+        if (strchr(operators, token[0]) != NULL) {
+            // Operator found
+            char *op = malloc(2);
+            strncpy(op, token, 1);
+            op[1] = '\0';
+
+            // Pop two operands
+            char *operand2 = operands[--operandCount];
+            char *operand1 = operands[--operandCount];
+
+            // Generate a temporary variable
+            char *tempVar = generateTemp();
+            tempVars[tempVarCount++] = tempVar;
+
+            // Print the three-address code
+            printf("%s = %s %s %s\n", tempVar, operand1, op, operand2);
+
+            // Push the temporary variable back to the operands stack
+            operands[operandCount++] = tempVar;
+
+            free(op);
+        } else {
+            // Operand found
+            operands[operandCount++] = token;
+        }
+
+        token = strtok(NULL, " ");
+    }
+
+    // Print the final result
+    if (tempVarCount > 0) {
+        printf("Result = %s\n", tempVars[tempVarCount - 1]);
+    } else {
+        printf("Result = %s\n", operands[operandCount - 1]);
+    }
+
+    // Free dynamically allocated memory
+    for (int i = 0; i < tempVarCount; i++) {
+        free(tempVars[i]);
+    }
+}
+
+int main() {
+    char expression[100];
+
+    // Input infix expression from the user
+    printf("Enter an infix arithmetic expression: ");
+    fgets(expression, sizeof(expression), stdin);
+
+    // Remove the newline character from the input
+    if (expression[strlen(expression) - 1] == '\n') {
+        expression[strlen(expression) - 1] = '\0';
+    }
+
+    // Generate and print three-address code
+    generateThreeAddressCode(expression);
+
+    return 0;
+}
