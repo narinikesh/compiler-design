@@ -80,3 +80,47 @@ int main() {
 
     return 0;
 }
+
+
+
+
+
+
+
+
+
+
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <ctype.h>
+
+void generateThreeAddressCode(char* expression) {
+    char* token = strtok(expression, " ");
+
+    int t = 1; // Temp variable counter
+
+    while (token != NULL) {
+        if (isdigit(*token) || (strlen(token) > 1 && isdigit(token[1]))) {
+            printf("t%d = %s\n", t, token);
+        } else if (strchr("+-*/", *token)) {
+            char op = *token;
+            token = strtok(NULL, " ");
+            printf("t%d = t%d %c %s\n", t + 1, t, op, token);
+            t++;
+        }
+        t++;
+        token = strtok(NULL, " ");
+    }
+}
+
+int main() {
+    char input[] = "A + B * C - D / A"; // Replace with your input expression
+
+    printf("Input Expression: %s\n", input);
+    printf("Three-Address Code:\n");
+    generateThreeAddressCode(input);
+
+    return 0;
+}
